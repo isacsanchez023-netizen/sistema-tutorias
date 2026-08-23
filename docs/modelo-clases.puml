@@ -1,0 +1,73 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+abstract class Usuario {
+  # id: String
+  # nombre: String
+  # email: String
+  + getId(): String
+  + getNombre(): String
+  + getEmail(): String
+}
+
+class Estudiante {
+  - carrera: String
+  + getCarrera(): String
+}
+
+class Docente {
+  - departamento: String
+  + getDepartamento(): String
+}
+
+Usuario <|-- Estudiante
+Usuario <|-- Docente
+
+enum EstadoReserva {
+  PENDIENTE
+  CONFIRMADA
+  CANCELADA
+}
+
+class Reserva {
+  - id: Long
+  - estado: EstadoReserva
+  + confirmar(): void
+  + cancelar(): void
+  + getEstado(): EstadoReserva
+  + getId(): Long
+}
+
+class HorarioTutoria {
+  - inicio: LocalDateTime
+  - fin: LocalDateTime
+  - disponible: boolean
+  + reservar(): void
+  + liberar(): void
+  + getInicio(): LocalDateTime
+  + getFin(): LocalDateTime
+  + isDisponible(): boolean
+}
+
+interface Notificador {
+  + enviar(destinatario: String, mensaje: String): void
+}
+
+interface RepositorioReservas {
+  + guardar(reserva: Reserva): void
+}
+
+class ServicioReservas {
+  - repositorio: RepositorioReservas
+  - notificador: Notificador
+  + procesarReserva(reserva: Reserva, emailEstudiante: String): void
+}
+
+Estudiante "1" -- "0..*" Reserva
+Docente "1" -- "0..*" HorarioTutoria
+Reserva "1" --> "1" HorarioTutoria
+ServicioReservas ..> Notificador
+ServicioReservas ..> RepositorioReservas
+ServicioReservas ..> Reserva
+
+@enduml
