@@ -1,0 +1,63 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+' ==========================================
+' PATRÓN OBSERVER (Notificaciones)
+' ==========================================
+enum EstadoReserva {
+  PENDIENTE
+  CONFIRMADA
+  CANCELADA
+}
+
+interface ReservaObserver {
+  + onReservaConfirmada(reserva: Reserva): void
+}
+
+class Reserva {
+  - id: Long
+  - estado: EstadoReserva
+  - observadores: List<ReservaObserver>
+  + Reserva(id: Long)
+  + agregarObservador(observer: ReservaObserver): void
+  + confirmar(): void
+  + cancelar(): void
+  + getEstado(): EstadoReserva
+  + getId(): Long
+}
+
+class EmailObserver {
+  + onReservaConfirmada(reserva: Reserva): void
+}
+
+class CalendarioObserver {
+  + onReservaConfirmada(reserva: Reserva): void
+}
+
+' Relaciones del Observer
+ReservaObserver <|.. EmailObserver
+ReservaObserver <|.. CalendarioObserver
+Reserva "1" --> "0..*" ReservaObserver : notifica >
+
+' ==========================================
+' PATRÓN ADAPTER (Salas Virtuales)
+' ==========================================
+interface Videoconferencia {
+  + crearSala(titulo: String, correoDocente: String): String
+}
+
+class ProveedorZoom {
+  + scheduleMeeting(subject: String, organizer: String): String
+}
+
+class ZoomAdapter {
+  - apiZoom: ProveedorZoom
+  + ZoomAdapter()
+  + crearSala(titulo: String, correoDocente: String): String
+}
+
+' Relaciones del Adapter
+Videoconferencia <|.. ZoomAdapter
+ZoomAdapter "1" --> "1" ProveedorZoom : traduce a >
+
+@enduml
